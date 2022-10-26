@@ -3,7 +3,6 @@ from pydantic import BaseModel
 from typing import List
 import uvicorn
 import httpx
-import os
 
 # This is page access token that you get from facebook developer console.
 PAGE_ACCESS_TOKEN = 'EAAGQoF3oHhEBAFIZC1ZCx7wx4ngCcgZAKwEZCtBzTQkGOQXu4k6jENLH35bV0F3hWBMO8Jlasin9BsvgU206541dnRePHXXz5TZBBXEXYfkxuZBuZAntS8nJ4VMFu1RgZC9AiwMCKN69J9R5sZAgmttIPyAZAYrgddZCP9mZBsM9NZAxskuFUgB5p5Tm9'
@@ -83,7 +82,7 @@ async def webhook(data: WebhookRequestData):
 
 # Debug.
 def main():
-    if "VERIFY_TOKEN" in os.environ:
+    if VERIFY_TOKEN:
         print("your verify token is: ", VERIFY_TOKEN)
 
     uvicorn.run(app=app)
