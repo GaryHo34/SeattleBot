@@ -37,7 +37,7 @@ async def send_message(
 
 # Init App.
 app = FastAPI()
-
+load_dotenv()
 
 # Endpoints.
 @app.get("/")
