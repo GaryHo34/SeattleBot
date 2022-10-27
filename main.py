@@ -1,51 +1,86 @@
-import requests
+from pydantic import BaseModel
+from typing import List
+import uvicorn
+import httpx
 from fastapi import FastAPI, Request, Response
 from dotenv import load_dotenv
-import json
 import os
 
 app = FastAPI()
 load_dotenv()
 
-API = "https://graph.facebook.com/v15.0/me/messages?access_token=" + \
-    os.getenv('PAGE_ACCESS_TOKEN')
+API_URL = os.getenv('META_API_URL')
+ACCESS_TOKEN = os.getenv('PAGE_ACCESS_TOKEN')
+VERIFY_TOKEN = os.getenv('VERIFY_TOKEN')
 
 
-def fb_send_message(to, message):
-    message = json.dumps({
-        "recipient": {"id": to},
-        "message": {"text": message}
-    })
+class WebhookRequestData(BaseModel):
+    object: str = ""
+    entry: List = []
 
-    req = requests.post(API,
-                        headers={"Content-Type": "application/json"},
-                        data=message)
+# Helpers
+async def send_message(
+    url: str,
+    page_access_token: str,
+    recipient_id: str,
+    message_text: str,
+    message_type: str = "UPDATE",
+):
+    try:
+        response = httpx.post(
+            url=url,
+            params={"access_token": page_access_token},
+            headers={"Content-Type": "application/json"},
+            json={
+                "recipient": {"id": recipient_id},
+                "message": {"text": message_text},
+                "messaging_type": message_type,
+            },
+        )
+    except:
+        # This is an http error
+        response.raise_for_status()
 
-    print(req.status_code)
 
-
-@app.get("/api/webhook")
+@app.get("/")
 def fb_webhook(request: Request):
-    if request.query_params.get("hub.mode") == "subscribe" and request.query_params.get(
-        "hub.challenge"
-    ):
-        if (
-            not request.query_params.get("hub.verify_token")
-            == os.getenv('VERIFY_TOKEN')
-        ):
+    if (request.query_params.get("hub.mode") == "subscribe" and
+            request.query_params.get("hub.challenge")):
+        if (request.query_params.get("hub.verify_token") != VERIFY_TOKEN):
             return Response(content="Verification token mismatch", status_code=403)
         return Response(content=request.query_params["hub.challenge"])
     return Response(content="Required arguments haven't passed.", status_code=400)
 
 
-@app.post("/api/webhook")
-async def fb_receive_message(request: Request):
-    data = await request.body()
-    message_entries = json.loads(data.decode('utf8'))['entry']
-    for entry in message_entries:
-        for message in entry['messaging']:
-            id = message['sender']['id']
-            text = message['message']['text']
-            print("{} says {}".format(id, text))
-            fb_send_message(id, message="echo>>"+text)
-    return Response(content="Recived webhook", status_code=200)
+@app.post("/")
+async def webhook(data: WebhookRequestData):
+    """
+    Messages handler.
+    """
+    if data.object == "page":
+        for entry in data.entry:
+            messaging_events = [
+                event for event in entry.get("messaging", []) if event.get("message")
+            ]
+            for event in messaging_events:
+                message = event.get("message")
+                sender_id = event["sender"]["id"]
+
+                await send_message(url=API_URL,
+                                   page_access_token=ACCESS_TOKEN,
+                                   recipient_id=sender_id,
+                                   message_text=f"echo: {message['text']}")
+
+    return Response(content="ok")
+
+
+# Debug.
+def main():
+    if VERIFY_TOKEN:
+        print("your verify token is: ", VERIFY_TOKEN)
+
+    uvicorn.run(app=app)
+
+
+if __name__ == "__main__":
+    main()
