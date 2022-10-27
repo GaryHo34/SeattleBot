@@ -78,9 +78,7 @@ async def webhook(data: WebhookRequestData):
 def main():
     if VERIFY_TOKEN:
         print("your verify token is: ", VERIFY_TOKEN)
-
     uvicorn.run(app=app)
-
 
 if __name__ == "__main__":
     main()
