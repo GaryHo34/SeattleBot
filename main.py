@@ -68,8 +68,8 @@ async def send_button_message(
                             "payload": "I want to know weather"
                         }, {
                             "content_type": "text",
-                            "title": "temparaturre",
-                            "payload": "I want to know temparaturre"
+                            "title": "temperature",
+                            "payload": "I want to know temperature"
                         }
                     ]
                 },
@@ -79,6 +79,100 @@ async def send_button_message(
     except:
         # This is an http error
         response.raise_for_status()
+
+
+async def send_next_message(
+    url: str,
+    page_access_token: str,
+    recipient_id: str,
+    message_type: str = "RESPONSE",
+):
+    try:
+        response = httpx.post(
+            url=url,
+            params={"access_token": page_access_token},
+            headers={"Content-Type": "application/json"},
+            json={
+                "recipient": {"id": recipient_id},
+                "message": {
+                    "attachment": {
+                        "type": "template",
+                        "payload": {
+                            "template_type": "button",
+                            "text": "What do you want to do next?",
+                            "buttons": [
+                                {
+                                    "type": "web_url",
+                                    "url": "https://www.messenger.com",
+                                    "title": "Visit Messenger"
+                                },
+                                {
+                                    "type": "web_url",
+                                    "url": "https://www.youtube.com",
+                                    "title": "Visit Youtube"
+                                },
+                            ]
+                        }
+                    }
+                }
+            }
+        )
+    except:
+        # This is an http error
+        response.raise_for_status()
+
+
+async def send_home_message(
+    url: str,
+    page_access_token: str,
+    recipient_id: str,
+    message_type: str = "RESPONSE",
+):
+    try:
+        home_response = httpx.post(
+            url=url,
+            params={"access_token": page_access_token},
+            headers={"Content-Type": "application/json"},
+            json={
+                "recipient": {
+                    "id": recipient_id
+                },
+                "message": {
+                    "attachment": {
+                        "type": "template",
+                        "payload": {
+                                "template_type": "generic",
+                                "elements": [
+                                    {
+                                        "title": "Welcome!",
+                                        "image_url": "https://media.cntraveler.com/photos/60480c67ff9cba52f2a91899/16:9/w_2560%2Cc_limit/01-velo-header-seattle-needle.jpg",
+                                        "subtitle": "Your BEST Seattle local guide!",
+                                        "default_action": {
+                                            "type": "web_url",
+                                            "url": "https://github.com/GaryHo34/SeattleBot",
+                                            "webview_height_ratio": "tall",
+                                        },
+                                        "buttons": [
+                                            {
+                                                "type": "web_url",
+                                                "url": "https://github.com/GaryHo34/SeattleBot",
+                                                "title": "Our GitHub Page"
+                                            }, {
+                                                "type": "postback",
+                                                "title": "Start Chatting",
+                                                "payload": "DEVELOPER_DEFINED_PAYLOAD"
+                                            }
+                                        ]
+                                    }
+                                ]
+                        }
+                    }
+                }
+            }
+        )
+    except:
+        # This is an http error
+        home_response.raise_for_status()
 
 
 @ app.get("/")
@@ -96,7 +190,7 @@ async def webhook(data: WebhookRequestData):
     """
     Messages handler.
     """
-    print(data)
+    # print(data)
     if data.object == "page":
         for entry in data.entry:
             messaging_events = [
@@ -106,9 +200,19 @@ async def webhook(data: WebhookRequestData):
                 message = event.get("message")
                 sender_id = event["sender"]["id"]
 
-                await send_button_message(url=API_URL,
-                                          page_access_token=ACCESS_TOKEN,
-                                          recipient_id=sender_id)
+                if message['text'] == "weather":
+                    await send_button_message(url=API_URL,
+                                              page_access_token=ACCESS_TOKEN,
+                                              recipient_id=sender_id)
+                elif message['text'] == "next":
+                    await send_next_message(url=API_URL,
+                                            page_access_token=ACCESS_TOKEN,
+                                            recipient_id=sender_id)
+                else:
+                    await send_home_message(url=API_URL,
+                                            page_access_token=ACCESS_TOKEN,
+                                            recipient_id=sender_id)
+
     print("PK")
     return Response(content="ok")
 
