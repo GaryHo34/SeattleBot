@@ -23,7 +23,7 @@ def generateButtonMessage(message: str):
         RESPONSE_TYPE.BUTTONS: [
             generateButton(BUTTON_TYPE.URL, "Visit Messenger",
                            "https://www.messenger.com", ""),
-            generateButton(BUTTON_TYPE.POSTBACK, "Visit Messenger",
-                           "", "Messenger"),
+            generateButton(BUTTON_TYPE.POSTBACK, "Ask weather",
+                           "", "weather"),
         ]
     }
