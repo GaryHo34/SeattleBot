@@ -1,17 +1,19 @@
-from schemas.schema import UserInfo
+from schemas import *
+from constant import *
+from utiltypes import UserInfo
+from utils import *
 import httpx
 
 
-async def send_message(user: UserInfo):
+async def send_text_message(user: UserInfo, message: str):
     try:
         response = httpx.post(
-            url=url,
-            params={"access_token": user.page_access_token},
-            headers={"Content-Type": "application/json"},
+            url=API_URL,
+            params=ACCESS_TOKEN,
+            headers=HEADER,
             json={
                 "recipient": {"id": user.recipient_id},
-                "message": {"text": user.message_text},
-                "messaging_type": user.message_type,
+                "message": generateTextMessage(message)
             },
         )
     except:
@@ -19,29 +21,15 @@ async def send_message(user: UserInfo):
         response.raise_for_status()
 
 
-async def send_button_message(user: UserInfo):
+async def send_QuickReply_message(user: UserInfo, message: str):
     try:
         response = httpx.post(
-            url=user.url,
-            params={"access_token": user.page_access_token},
-            headers={"Content-Type": "application/json"},
+            url=API_URL,
+            params=ACCESS_TOKEN,
+            headers=HEADER,
             json={
                 "recipient": {"id": user.recipient_id},
-                "message": {
-                    "text": "What do you want to know?",
-                    "quick_replies": [
-                        {
-                            "content_type": "text",
-                            "title": "Weather",
-                            "payload": "I want to know weather"
-                        }, {
-                            "content_type": "text",
-                            "title": "temperature",
-                            "payload": "I want to know temperature"
-                        }
-                    ]
-                },
-                "messaging_type": user.message_type,
+                "message": generateQuickReplyMessage(message)
             },
         )
     except:
@@ -49,33 +37,18 @@ async def send_button_message(user: UserInfo):
         response.raise_for_status()
 
 
-async def send_next_message(user: UserInfo):
+async def send_template_message(user: UserInfo):
     try:
         response = httpx.post(
-            url=user.url,
-            params={"access_token": user.page_access_token},
-            headers={"Content-Type": "application/json"},
+            url=API_URL,
+            params=ACCESS_TOKEN,
+            headers=HEADER,
             json={
                 "recipient": {"id": user.recipient_id},
                 "message": {
                     "attachment": {
                         "type": "template",
-                        "payload": {
-                            "template_type": "button",
-                            "text": "What do you want to do next?",
-                            "buttons": [
-                                {
-                                    "type": "web_url",
-                                    "url": "https://www.messenger.com",
-                                    "title": "Visit Messenger"
-                                },
-                                {
-                                    "type": "web_url",
-                                    "url": "https://www.youtube.com",
-                                    "title": "Visit Youtube"
-                                },
-                            ]
-                        }
+                        "payload": generateButtonMessage("What do you want to do next?")
                     }
                 }
             }
