@@ -1,4 +1,3 @@
-from schemas import *
 from constant import *
 from utiltypes import UserInfo
 from utils import *
