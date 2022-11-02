@@ -41,6 +41,11 @@ class UserInfo(BaseModel):
     message_text: Optional[str] = "None"
     message_type: Optional[str] = "RESPONSE"
 
+class Business(BaseModel):
+    name: str
+    address: str
+    rating: str
+    rating_count: int
 
 RESPONSE_TYPE = RES_TYPE()
 ASSET_TYPE = AST_TYPE()

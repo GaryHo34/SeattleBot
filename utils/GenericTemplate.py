@@ -10,7 +10,7 @@ def generateOption(title: str, payload: str, image_url=""):
     }
 
 
-def generateQuickReplyMessage():
+def generateGenericMessage():
     return {
         "template_type": TEMPLATE_TYPE.GENERIC,
         "elements": [
