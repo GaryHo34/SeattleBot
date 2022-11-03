@@ -12,7 +12,7 @@ async def send_text_message(user: UserInfo, message: str):
             headers=HEADER,
             json={
                 "recipient": {"id": user.recipient_id},
-                "message": message
+                "message": generateTextMessage(message)
             },
         )
     except:
