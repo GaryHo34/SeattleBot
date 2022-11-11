@@ -21,6 +21,7 @@ class TEP_TYPE(BaseModel):
     BUTTON = "button"
     GENERIC = "generic"
 
+
 class BUT_TYPE(BaseModel):
     URL = "web_url"
     POSTBACK = "postback"
@@ -40,6 +41,13 @@ class UserInfo(BaseModel):
     recipient_id: str
     message_text: Optional[str] = "None"
     message_type: Optional[str] = "RESPONSE"
+
+
+class Business(BaseModel):
+    name: str
+    address: str
+    rating: str
+    rating_count: int
 
 
 RESPONSE_TYPE = RES_TYPE()
