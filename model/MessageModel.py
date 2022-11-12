@@ -1,5 +1,4 @@
 from pydantic import BaseModel
-import typing
 from typing import List, Optional
 
 
@@ -33,3 +32,4 @@ class QuickReplyMessage(BaseModel):
     quick_replies: List[QuickReply]
 
 # Todo type definition for GENERIC template message
+
