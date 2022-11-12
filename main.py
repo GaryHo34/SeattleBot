@@ -3,7 +3,7 @@ import uvicorn
 from typing import List
 from model import UserInfo, WebhookRequestData
 from helper import send_template_message, send_text_message, send_quickreply_message
-from api import getWeatherInfo, getYelpInfo
+from api import get_weather_info, get_yelp_info
 from constant import META_VERIFY_TOKEN
 
 app = FastAPI()
@@ -41,7 +41,7 @@ def webhook(data: WebhookRequestData):
                 user = UserInfo(recipient_id=sender_id)
 
                 if message and message.get('text', '') == "yelp":
-                    resList = getYelpInfo()
+                    resList = get_yelp_info()
                     res = []
                     res.append(
                         "This is the top 10 recommended coffee places: \n")
@@ -53,7 +53,7 @@ def webhook(data: WebhookRequestData):
                     return
 
                 if message.get('quick_reply', None) and message['quick_reply'].get('payload', None)== "weather":
-                    temp, weather = getWeatherInfo()
+                    temp, weather = get_weather_info()
                     send_text_message(
                         user, f'The temprature is {temp}F, the weather is {weather}')
                     return
