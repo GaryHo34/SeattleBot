@@ -1,28 +1,28 @@
-from typing import List
-import uvicorn
 from fastapi import FastAPI, Request, Response
-from constant import *
-from schemas import *
-from service import *
-from utiltypes import *
+import uvicorn
+from typing import List
+from model import UserInfo, WebhookRequestData
+from helper import send_template_message, send_text_message, send_quickreply_message
+from api import get_weather_info, get_yelp_info
+from constant import META_VERIFY_TOKEN
 
 app = FastAPI()
 
 # Helpers
 
 
-@ app.get("/")
+@app.get("/")
 def fb_webhook(request: Request):
     if (request.query_params.get("hub.mode") == "subscribe" and
             request.query_params.get("hub.challenge")):
-        if (request.query_params.get("hub.verify_token") != VERIFY_TOKEN):
+        if (request.query_params.get("hub.verify_token") != META_VERIFY_TOKEN):
             return Response(content="Verification token mismatch", status_code=403)
         return Response(content=request.query_params["hub.challenge"])
     return Response(content="Required arguments haven't passed.", status_code=400)
 
 
-@ app.post("/")
-async def webhook(data: WebhookRequestData):
+@app.post("/")
+def webhook(data: WebhookRequestData):
     """
     Messages handler.
     """
@@ -32,18 +32,16 @@ async def webhook(data: WebhookRequestData):
             messaging_events = [
                 event for event in entry.get("messaging", []) if event.get("message") or event.get("postback")
             ]
+
             for event in messaging_events:
-                postback = event.get("postback")
-                message = event.get("message")
+                postback = event.get("postback", None)
+                message = event.get("message", None)
                 sender_id = event["sender"]["id"]
 
-                user = UserInfo(url=API_URL,
-                                page_access_token=ACCESS_TOKEN["access_token"],
-                                recipient_id=sender_id)
-                # to-do seperate function to function..
-                if message['text'] == "yelp":
-                    resList = await getYelpInfo()
-                    # print(resList)
+                user = UserInfo(recipient_id=sender_id)
+
+                if message and message.get('text', '') == "yelp":
+                    resList = get_yelp_info()
                     res = []
                     res.append(
                         "This is the top 10 recommended coffee places: \n")
@@ -51,20 +49,20 @@ async def webhook(data: WebhookRequestData):
                         curr = f'{i+1}: {shop.name}\n  address: {shop.address}\n  rating: {shop.rating},\n  rating_count: {shop.rating_count}\n'
                         res.append(curr)
                     res = "".join(res)
-                    # print(res)
-                    await send_text_message(user, res)
-                    return
-                if postback and postback['payload'] == "weather":
-                    temp, weather = await getWeatherInfo()
-                    await send_text_message(user, f'The temprature is {temp}F, the weather is {weather}')
+                    send_text_message(user, res)
                     return
 
-                await send_template_message(user)
+                if message.get('quick_reply', None) and message['quick_reply'].get('payload', None)== "weather":
+                    temp, weather = get_weather_info()
+                    send_text_message(
+                        user, f'The temprature is {temp}F, the weather is {weather}')
+                    return
+
+                send_quickreply_message(
+                    user, "What do you want to know", ["weather", "yelp"])
 
     return Response(content="ok")
 
+
 if __name__ == "__main__":
-    uvicorn.run("main:app",
-                host="127.0.0.1",
-                port=8000,
-                reload=True)
+    uvicorn.run("main:app", host="127.0.0.1", port=8000, reload=True)
