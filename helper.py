@@ -80,7 +80,7 @@ def send_home_message(user: UserInfo):
         url=META_API_URL,
         headers=HEADER,
         params=PARAMS,
-        json={
+        data={
             "recipient": {
                 "id": user.recipient_id
             },
@@ -104,11 +104,11 @@ def send_home_message(user: UserInfo):
                                         "type": "web_url",
                                                 "url": "https://github.com/GaryHo34/SeattleBot",
                                                 "title": "Our GitHub Page"
-                                    }, {
-                                        "type": "postback",
-                                                "title": "Start Chatting",
-                                                "payload": "DEVELOPER_DEFINED_PAYLOAD"
-                                    }
+                                    },
+                                    PostbackButton(title="Local Recommendation",
+                                                   payload="yelp").dict(),
+                                    PostbackButton(title="Quick Actions",
+                                                   payload="quick_reply").dict()
                                 ]
                             }
                         ]
