@@ -1,5 +1,5 @@
 from pydantic import BaseModel
-from typing import List, Optional
+from typing import List, Optional, Union
 
 
 class TextMessage(BaseModel):
@@ -33,3 +33,8 @@ class QuickReplyMessage(BaseModel):
 
 # Todo type definition for GENERIC template message
 
+
+class PersistentMenu(BaseModel):
+    locale: str = "Default"
+    composer_input_disable: bool = False
+    call_to_actions: List[Union[PostbackButton, WeburlButton]]

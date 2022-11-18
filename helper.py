@@ -1,12 +1,23 @@
 from constant import META_ACCESS_TOKEN, META_API_URL
-from model.MessageModel import TextMessage, WeburlButton, PostbackButton, QuickReply, QuickReplyMessage
-from typing import Optional, List
+from model.MessageModel import TextMessage, WeburlButton, PostbackButton, QuickReply, QuickReplyMessage, PersistentMenu
+from typing import Optional, List, Union
 from service import post
 from model import UserInfo
 
 # constant
 HEADER = {"Content-Type": "application/json"}
 PARAMS = {"access_token": META_ACCESS_TOKEN}
+# menu = PersistentMenu(call_to_actions=[WeburlButton(
+#     title="hi", url="url"), PostbackButton(title="title", payload="postback")])
+# print(menu.dict())
+
+
+def generate_menu() -> PersistentMenu:
+    button1 = generate_postback_button(title="Local Recommendation",
+                                       postback="yelp")
+    button2 = generate_postback_button(title="Quick Actions",
+                                       postback="quick")
+    return PersistentMenu(call_to_actions=[button1, button2])
 
 
 def generate_web_button(title: str, url: str) -> WeburlButton:
@@ -14,7 +25,7 @@ def generate_web_button(title: str, url: str) -> WeburlButton:
 
 
 def generate_postback_button(title: str, postback: str) -> PostbackButton:
-    return WeburlButton(title, postback)
+    return PostbackButton(title=title, payload=postback)
 
 
 def generate_quickreply_message(message: str, options: Optional[List[str]] = None) -> QuickReplyMessage:
@@ -23,6 +34,18 @@ def generate_quickreply_message(message: str, options: Optional[List[str]] = Non
         for option in options:
             optionList.append(QuickReply(title=option, payload=option))
     return QuickReplyMessage(text=message, quick_replies=optionList)
+
+
+def send_persistent_menu(user: UserInfo):
+    post(
+        url=META_API_URL,
+        headers=HEADER,
+        params=PARAMS,
+        data={
+            "recipient": {"id": user.recipient_id},
+            "message": generate_menu().dict()
+        },
+    )
 
 
 def send_text_message(user: UserInfo, message: str):
@@ -105,10 +128,10 @@ def send_home_message(user: UserInfo):
                                                 "url": "https://github.com/GaryHo34/SeattleBot",
                                                 "title": "Our GitHub Page"
                                     },
-                                    PostbackButton(title="Local Recommendation",
-                                                   payload="yelp").dict(),
-                                    PostbackButton(title="Quick Actions",
-                                                   payload="quick_reply").dict()
+                                    generate_postback_button(title="Local Recommendation",
+                                                             postback="yelp").dict(),
+                                    generate_postback_button(title="Quick Actions",
+                                                             postback="quick").dict()
                                 ]
                             }
                         ]
