@@ -14,5 +14,5 @@ def get_weather_info():
     if response and response.get("properties", None):
         temp = response["properties"]["periods"][0]["temperature"]
         weather = response["properties"]["periods"][0]["detailedForecast"]
-    
+
     return temp, weather

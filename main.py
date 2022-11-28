@@ -2,7 +2,7 @@ from fastapi import FastAPI, Request, Response
 import uvicorn
 from typing import List
 from model import UserInfo, WebhookRequestData
-from helper import send_template_message, send_text_message, send_quickreply_message
+from helper import *
 from api import get_weather_info, get_yelp_info
 from constant import META_VERIFY_TOKEN
 
@@ -26,7 +26,7 @@ def webhook(data: WebhookRequestData):
     """
     Messages handler.
     """
-    # print(data)
+    print(data)
     if data.object == "page":
         for entry in data.entry:
             messaging_events = [
@@ -37,29 +37,49 @@ def webhook(data: WebhookRequestData):
                 postback = event.get("postback", None)
                 message = event.get("message", None)
                 sender_id = event["sender"]["id"]
-
                 user = UserInfo(recipient_id=sender_id)
+                # Types of restaurants
+                cuisineType = ["Coffee", "Brunch", "Japanese",
+                               "Mexican", "American", "Chinese"]
+                typeIdx = [str(i+1) for i in range(len(cuisineType))]
 
-                if message and message.get('text', '') == "yelp":
-                    resList = get_yelp_info()
+                if (message and message.get('text', '') == "yelp") or (postback and postback.get('payload', None) and postback['payload'] == "yelp"):
+                    types = [str(i+1) + ". " + c for i,
+                             c in enumerate(cuisineType)]
+                    msg = f"What do you want to have?\n" + "   ".join(types)
+                    send_quickreply_message(user, msg, typeIdx)
+                    return
+
+                if message and message.get('quick_reply', None) and message['quick_reply'].get('payload', None) in typeIdx:
+                    idx = message['quick_reply'].get('payload', None)
+                    cuisine = cuisineType[int(idx) - 1]
+                    resList = get_yelp_info(cuisine)
                     res = []
                     res.append(
-                        "This is the top 10 recommended coffee places: \n")
+                        f"This is the top 10 recommended {cuisine} places: \n")
                     for i, shop in enumerate(resList):
-                        curr = f'{i+1}: {shop.name}\n  address: {shop.address}\n  rating: {shop.rating},\n  rating_count: {shop.rating_count}\n'
+                        curr = f'{i+1}: {shop.name}\n' + \
+                            f'  address: {shop.address}\n' + \
+                            f'  rating: {shop.rating}\n' + \
+                            f'  rating_count: {shop.rating_count}\n'
                         res.append(curr)
                     res = "".join(res)
                     send_text_message(user, res)
                     return
 
-                if message.get('quick_reply', None) and message['quick_reply'].get('payload', None)== "weather":
+                if message and message.get('quick_reply', None) and message['quick_reply'].get('payload', None) == "weather":
                     temp, weather = get_weather_info()
                     send_text_message(
                         user, f'The temprature is {temp}F, the weather is {weather}')
                     return
 
-                send_quickreply_message(
-                    user, "What do you want to know", ["weather", "yelp"])
+                if postback and postback.get('payload', None) and postback['payload'] == "quick":
+                    send_quickreply_message(
+                        user, "What do you want to know", ["weather", "yelp"])
+                    return
+
+                send_home_message(user)
+                # send_persistent_menu(user)
 
     return Response(content="ok")
 

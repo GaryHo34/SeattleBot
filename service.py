@@ -3,6 +3,7 @@ from typing import Optional
 
 # Wrap requests service for better error handling
 
+
 def get(
     url: str,
     headers: Optional[dict] = None,
@@ -33,6 +34,7 @@ def post(
     headers: Optional[dict] = None,
     params: Optional[dict] = None
 ):
+    # print(data)
     try:
         response = requests.post(url=url,
                                  headers=headers,
