@@ -1,6 +1,6 @@
 # Seattle Bot
 
-This is a **Facebook Messenger Bot** aiming to provide users with Seattle local recommendations and travel information.
+This is a **Facebook Messenger Bot** implemented with FastAPI. It aims to provide users with Seattle local information and build wrapper for Facebook messenger platform for ease of use.
 
 ---
 

@@ -28,11 +28,11 @@ def webhook(data: WebhookRequestData):
     """
     print(data)
     if data.object == "page":
+
         for entry in data.entry:
             messaging_events = [
                 event for event in entry.get("messaging", []) if event.get("message") or event.get("postback")
             ]
-
             for event in messaging_events:
                 postback = event.get("postback", None)
                 message = event.get("message", None)
@@ -42,6 +42,11 @@ def webhook(data: WebhookRequestData):
                 cuisineType = ["Coffee", "Brunch", "Japanese",
                                "Mexican", "American", "Chinese"]
                 typeIdx = [str(i+1) for i in range(len(cuisineType))]
+
+                send_get_started()
+                send_welcome_message()
+                if postback and postback.get('payload', None) == "start":
+                    send_home_message(user)
 
                 if (message and message.get('text', '') == "yelp") or (postback and postback.get('payload', None) and postback['payload'] == "yelp"):
                     types = [str(i+1) + ". " + c for i,
@@ -77,9 +82,6 @@ def webhook(data: WebhookRequestData):
                     send_quickreply_message(
                         user, "What do you want to know", ["weather", "yelp"])
                     return
-
-                send_home_message(user)
-                # send_persistent_menu(user)
 
     return Response(content="ok")
 

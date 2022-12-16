@@ -12,14 +12,6 @@ PARAMS = {"access_token": META_ACCESS_TOKEN}
 # print(menu.dict())
 
 
-def generate_menu() -> PersistentMenu:
-    button1 = generate_postback_button(title="Local Recommendation",
-                                       postback="yelp")
-    button2 = generate_postback_button(title="Quick Actions",
-                                       postback="quick")
-    return PersistentMenu(call_to_actions=[button1, button2])
-
-
 def generate_web_button(title: str, url: str) -> WeburlButton:
     return WeburlButton(title, url)
 
@@ -34,6 +26,32 @@ def generate_quickreply_message(message: str, options: Optional[List[str]] = Non
         for option in options:
             optionList.append(QuickReply(title=option, payload=option))
     return QuickReplyMessage(text=message, quick_replies=optionList)
+
+
+def send_get_started():
+    post(
+        url="https://graph.facebook.com/v2.6/me/messenger_profile?access_token",
+        headers=HEADER,
+        params=PARAMS,
+        data={
+            "get_started": {"payload": "start"}
+        },
+    )
+
+
+def send_welcome_message():
+    post(
+        url="https://graph.facebook.com/v2.6/me/messenger_profile?access_token",
+        headers=HEADER,
+        params=PARAMS,
+        data={
+            "greeting": [
+                {"locale": "default",
+                 "text": "Hello! {{user_first_name}} {{user_last_name}}!\n \
+                 This is your Best Seattle Local Guide!"}
+            ]
+        }
+    )
 
 
 def send_persistent_menu(user: UserInfo):
