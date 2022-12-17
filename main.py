@@ -5,11 +5,12 @@ from model import UserInfo, WebhookRequestData
 from helper import *
 from api import get_weather_info, get_yelp_info
 from constant import META_VERIFY_TOKEN
+from Message import MessageBot
 
 app = FastAPI()
 
+messageBot = MessageBot()
 # Helpers
-
 
 @app.get("/")
 def fb_webhook(request: Request):
@@ -42,16 +43,14 @@ def webhook(data: WebhookRequestData):
                                "Mexican", "American", "Chinese"]
                 typeIdx = [str(i+1) for i in range(len(cuisineType))]
 
-                send_get_started()
-                send_welcome_message()
                 if postback and postback.get('payload', None) == "start":
-                    send_home_message(user)
+                    messageBot.send_home_message(user)
 
                 if (message and message.get('text', '') == "yelp") or (postback and postback.get('payload', None) and postback['payload'] == "yelp"):
                     types = [str(i+1) + ". " + c for i,
                              c in enumerate(cuisineType)]
                     msg = f"What do you want to have?\n" + "   ".join(types)
-                    send_quickreply_message(user, msg, typeIdx)
+                    messageBot.send_quickreply_message(user, msg, typeIdx)
                     return
 
                 if message and message.get('quick_reply', None) and message['quick_reply'].get('payload', None) in typeIdx:
@@ -68,17 +67,17 @@ def webhook(data: WebhookRequestData):
                             f'  rating_count: {shop.rating_count}\n'
                         res.append(curr)
                     res = "".join(res)
-                    send_text_message(user, res)
+                    messageBot.send_text_message(user, res)
                     return
 
                 if message and message.get('quick_reply', None) and message['quick_reply'].get('payload', None) == "weather":
                     temp, weather = get_weather_info()
-                    send_text_message(
+                    messageBot.send_text_message(
                         user, f'The temprature is {temp}F, the weather is {weather}')
                     return
 
                 if postback and postback.get('payload', None) and postback['payload'] == "quick":
-                    send_quickreply_message(
+                    messageBot.send_quickreply_message(
                         user, "What do you want to know", ["weather", "yelp"])
                     return
 

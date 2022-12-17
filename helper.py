@@ -11,7 +11,7 @@ PARAMS = {"access_token": META_ACCESS_TOKEN}
 
 def generate_menu(buttons: List[Union[PostbackButton, WeburlButton]], locale: Optional[str] = None, composer_input_disable: Optional[bool]=None) -> PersistentMenu:
     if (locale and composer_input_disable!= None):
-        PersistentMenu(locale=locale, composer_input_disable=composer_input_disable, buttons=buttons).dict()
+        PersistentMenu(locale=locale, composer_input_disabled=composer_input_disable, buttons=buttons).dict()
     return PersistentMenu(call_to_actions=buttons).dict()
 
 def generate_web_button(title: str, url: str) -> WeburlButton:
@@ -57,11 +57,7 @@ def send_welcome_message():
 
 
 def send_persistent_menu():
-    post(
-        url="https://graph.facebook.com/v15.0/me/messenger_profile?access_token",
-        headers=HEADER,
-        params=PARAMS,
-        data={
+    print({
             "persistent_menu": [generate_menu(buttons=[
                 generate_web_button(
                     title="Our GitHub Page", url="https://github.com/GaryHo34/SeattleBot"),
@@ -70,8 +66,22 @@ def send_persistent_menu():
                 generate_postback_button(
                     title="Quick Actions", postback="quick"),
             ])]
-        },
-    )
+        })
+    # post(
+    #     url="https://graph.facebook.com/v15.0/me/messenger_profile",
+    #     headers=HEADER,
+    #     params=PARAMS,
+    #     data={
+    #         "persistent_menu": [generate_menu(buttons=[
+    #             generate_web_button(
+    #                 title="Our GitHub Page", url="https://github.com/GaryHo34/SeattleBot"),
+    #             generate_postback_button(
+    #                 title="Local Recommendation", postback="yelp"),
+    #             generate_postback_button(
+    #                 title="Quick Actions", postback="quick"),
+    #         ])]
+    #     },
+    # )
 
 
 def send_text_message(user: UserInfo, message: str):
