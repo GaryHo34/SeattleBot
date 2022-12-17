@@ -7,17 +7,19 @@ from model import UserInfo
 # constant
 HEADER = {"Content-Type": "application/json"}
 PARAMS = {"access_token": META_ACCESS_TOKEN}
-# menu = PersistentMenu(call_to_actions=[WeburlButton(
-#     title="hi", url="url"), PostbackButton(title="title", payload="postback")])
-# print(menu.dict())
 
+
+def generate_menu(buttons: List[Union[PostbackButton, WeburlButton]], locale: Optional[str] = None, composer_input_disable: Optional[bool]=None) -> PersistentMenu:
+    if (locale and composer_input_disable!= None):
+        PersistentMenu(locale=locale, composer_input_disable=composer_input_disable, buttons=buttons).dict()
+    return PersistentMenu(call_to_actions=buttons).dict()
 
 def generate_web_button(title: str, url: str) -> WeburlButton:
-    return WeburlButton(title, url)
+    return WeburlButton(title=title, url=url).dict()
 
 
 def generate_postback_button(title: str, postback: str) -> PostbackButton:
-    return PostbackButton(title=title, payload=postback)
+    return PostbackButton(title=title, payload=postback).dict()
 
 
 def generate_quickreply_message(message: str, options: Optional[List[str]] = None) -> QuickReplyMessage:
@@ -25,7 +27,7 @@ def generate_quickreply_message(message: str, options: Optional[List[str]] = Non
     if options:
         for option in options:
             optionList.append(QuickReply(title=option, payload=option))
-    return QuickReplyMessage(text=message, quick_replies=optionList)
+    return QuickReplyMessage(text=message, quick_replies=optionList).dict()
 
 
 def send_get_started():
@@ -41,7 +43,7 @@ def send_get_started():
 
 def send_welcome_message():
     post(
-        url="https://graph.facebook.com/v2.6/me/messenger_profile?access_token",
+        url="https://graph.facebook.com/v15.0/me/messenger_profile?access_token",
         headers=HEADER,
         params=PARAMS,
         data={
@@ -54,14 +56,20 @@ def send_welcome_message():
     )
 
 
-def send_persistent_menu(user: UserInfo):
+def send_persistent_menu():
     post(
-        url=META_API_URL,
+        url="https://graph.facebook.com/v15.0/me/messenger_profile?access_token",
         headers=HEADER,
         params=PARAMS,
         data={
-            "recipient": {"id": user.recipient_id},
-            "message": generate_menu().dict()
+            "persistent_menu": [generate_menu(buttons=[
+                generate_web_button(
+                    title="Our GitHub Page", url="https://github.com/GaryHo34/SeattleBot"),
+                generate_postback_button(
+                    title="Local Recommendation", postback="yelp"),
+                generate_postback_button(
+                    title="Quick Actions", postback="quick"),
+            ])]
         },
     )
 
@@ -85,7 +93,7 @@ def send_quickreply_message(user: UserInfo, message: str, options: Optional[List
         params=PARAMS,
         data={
             "recipient": {"id": user.recipient_id},
-            "message": generate_quickreply_message(message, options).dict()
+            "message": generate_quickreply_message(message, options)
         },
     )
 
@@ -141,15 +149,12 @@ def send_home_message(user: UserInfo):
                                             "webview_height_ratio": "tall",
                                 },
                                 "buttons": [
-                                    {
-                                        "type": "web_url",
-                                                "url": "https://github.com/GaryHo34/SeattleBot",
-                                                "title": "Our GitHub Page"
-                                    },
-                                    generate_postback_button(title="Local Recommendation",
-                                                             postback="yelp").dict(),
-                                    generate_postback_button(title="Quick Actions",
-                                                             postback="quick").dict()
+                                    generate_web_button(
+                                        title="Our GitHub Page", url="https://github.com/GaryHo34/SeattleBot"),
+                                    generate_postback_button(
+                                        title="Local Recommendation", postback="yelp"),
+                                    generate_postback_button(
+                                        title="Quick Actions", postback="quick"),
                                 ]
                             }
                         ]

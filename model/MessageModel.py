@@ -35,6 +35,6 @@ class QuickReplyMessage(BaseModel):
 
 
 class PersistentMenu(BaseModel):
-    locale: str = "Default"
+    locale: str = "default"
     composer_input_disable: bool = False
     call_to_actions: List[Union[PostbackButton, WeburlButton]]

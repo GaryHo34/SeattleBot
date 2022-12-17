@@ -20,7 +20,6 @@ def fb_webhook(request: Request):
         return Response(content=request.query_params["hub.challenge"])
     return Response(content="Required arguments haven't passed.", status_code=400)
 
-
 @app.post("/")
 def webhook(data: WebhookRequestData):
     """
