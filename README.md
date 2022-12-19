@@ -64,7 +64,11 @@ uvicorn main:app --reload
 
 ## Repository Structure
 
+```md
 📦SeattleBot
+ ┣ 📂Message
+ ┃ ┣ 📜Message.py
+ ┃ ┗ 📜__init__.py
  ┣ 📂api
  ┃ ┣ 📜__init__.py
  ┃ ┣ 📜weather.py
@@ -73,7 +77,6 @@ uvicorn main:app --reload
  ┃ ┣ 📜DataModel.py
  ┃ ┣ 📜MessageModel.py
  ┃ ┗ 📜__init__.py
- ┣ 📜.DS_Store
  ┣ 📜.env.sample
  ┣ 📜.gitignore
  ┣ 📜README.md
@@ -82,3 +85,4 @@ uvicorn main:app --reload
  ┣ 📜main.py
  ┣ 📜requirements.txt
  ┗ 📜service.py
+```

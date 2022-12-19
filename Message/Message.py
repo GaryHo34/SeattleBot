@@ -50,5 +50,5 @@ class MessageBot():
     def send_home_message(self, user: UserInfo):
         return send_home_message(user)
 
-    def send_quickreply_message(user: UserInfo, message: str, options: Optional[List[str]] = None):
+    def send_quickreply_message(self, user: UserInfo, message: str, options: Optional[List[str]] = None):
         return send_quickreply_message(user, message, options)
