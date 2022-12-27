@@ -66,23 +66,26 @@ uvicorn main:app --reload
 
 ```md
 📦SeattleBot
- ┣ 📂Message
- ┃ ┣ 📜Message.py
- ┃ ┗ 📜__init__.py
- ┣ 📂api
+ ┣ 📂example
+ ┃ ┣ ┣ 📂api
+ ┃ ┃ ┣ 📜__init__.py
+ ┃ ┃ ┣ 📜weather.py
+ ┃ ┃ ┗ 📜yelp.py
  ┃ ┣ 📜__init__.py
- ┃ ┣ 📜weather.py
- ┃ ┗ 📜yelp.py
+ ┃ ┗ 📜example.py
+ ┃ ┣ 📂messenger
+ ┃ ┣ 📜__init__.py
+ ┃ ┗ 📜Messenger.py
  ┣ 📂model
+ ┃ ┣ 📜__init__.py
  ┃ ┣ 📜DataModel.py
- ┃ ┣ 📜MessageModel.py
- ┃ ┗ 📜__init__.py
+ ┃ ┗ 📜MessageModel.py
  ┣ 📜.env.sample
  ┣ 📜.gitignore
  ┣ 📜README.md
- ┣ 📜constant.py
+ ┣ 📜config.py
  ┣ 📜helper.py
  ┣ 📜main.py
  ┣ 📜requirements.txt
- ┗ 📜service.py
+ ┗ 📜utils.py
 ```

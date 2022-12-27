@@ -2,6 +2,14 @@ from pydantic import BaseModel
 from typing import List, Optional, Union
 
 
+class Event(BaseModel):
+    type: str
+    sender: str
+    text: Optional[str]
+    quick_reply: Optional[str]
+    payload: Optional[str]
+
+
 class TextMessage(BaseModel):
     text: str
 

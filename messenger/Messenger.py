@@ -1,15 +1,20 @@
 from config import META_ACCESS_TOKEN, META_API_URL
-from model.MessageModel import TextMessage, WeburlButton, PostbackButton, QuickReply, QuickReplyMessage, PersistentMenu
 from typing import Optional, List, Union
+from model import UserInfo, TextMessage, WeburlButton, PostbackButton, QuickReply, QuickReplyMessage, PersistentMenu
 from utils import post
-from model import UserInfo
+from typing import Optional, List, Union
 
 # constant
-HEADER = {"Content-Type": "application/json"}
+MESSAGE_PROFILE_URL = "https://graph.facebook.com/v15.0/me/messenger_profile"
 PARAMS = {"access_token": META_ACCESS_TOKEN}
+IMAGE_SRC = "https://media.cntraveler.com/photos/60480c67ff9cba52f2a91899/16:9/w_2560%2Cc_limit/01-velo-header-seattle-needle.jpg"
 
 
-def generate_menu(buttons: List[Union[PostbackButton, WeburlButton]], locale: Optional[str] = None, composer_input_disable: Optional[bool] = None) -> PersistentMenu:
+def generate_menu(
+    buttons: List[Union[PostbackButton, WeburlButton]],
+    locale: Optional[str] = None,
+    composer_input_disable: Optional[bool] = None
+) -> PersistentMenu:
     if (locale and composer_input_disable != None):
         PersistentMenu(
             locale=locale, composer_input_disabled=composer_input_disable, buttons=buttons).dict()
@@ -24,7 +29,10 @@ def generate_postback_button(title: str, postback: str) -> PostbackButton:
     return PostbackButton(title=title, payload=postback).dict()
 
 
-def generate_quickreply_message(message: str, options: Optional[List[str]] = None) -> QuickReplyMessage:
+def generate_quickreply_message(
+    message: str,
+    options: Optional[List[str]] = None
+) -> QuickReplyMessage:
     optionList: List[QuickReply] = []
     if options:
         for option in options:
@@ -43,7 +51,11 @@ def send_text_message(user: UserInfo, message: str):
     )
 
 
-def send_quickreply_message(user: UserInfo, message: str, options: Optional[List[str]] = None):
+def send_quickreply_message(
+    user: UserInfo,
+    message: str,
+    options: Optional[List[str]] = None
+):
     post(
         url=META_API_URL,
         params=PARAMS,
@@ -95,7 +107,7 @@ def send_home_message(user: UserInfo):
                         "elements": [
                             {
                                 "title": "Welcome!",
-                                "image_url": "https://media.cntraveler.com/photos/60480c67ff9cba52f2a91899/16:9/w_2560%2Cc_limit/01-velo-header-seattle-needle.jpg",
+                                "image_url": IMAGE_SRC,
                                 "subtitle": "Your BEST Seattle local guide!",
                                 "default_action": {
                                             "type": "web_url",
@@ -117,3 +129,47 @@ def send_home_message(user: UserInfo):
             }
         }
     )
+
+
+def set_messenger_profile():
+    post(
+        url=MESSAGE_PROFILE_URL,
+        params=PARAMS,
+        data={
+            "get_started": {"payload": "start"},
+            "greeting": [
+                {
+                    "locale": "default",
+                    "text": "Hello!This is your Best Seattle Local Guide!",
+                }
+            ],
+            "persistent_menu": [
+                generate_menu(buttons=[
+                    generate_web_button(
+                        title="Our GitHub Page", url="https://github.com/GaryHo34/SeattleBot"),
+                    generate_postback_button(
+                        title="Local Recommendation", postback="yelp"),
+                    generate_postback_button(
+                        title="Quick Actions", postback="quick"),
+                ])
+            ]
+        },
+    )
+
+
+class MessengerBot():
+    def __init__(self, set_profile: bool):
+        if set_profile:
+            set_messenger_profile()
+
+    def send_text_message(self, user: UserInfo, message: str):
+        return send_text_message(user, message)
+
+    def send_template_message(self, user: UserInfo, message: str):
+        return send_template_message(user, message)
+
+    def send_home_message(self, user: UserInfo):
+        return send_home_message(user)
+
+    def send_quickreply_message(self, user: UserInfo, message: str, options: Optional[List[str]] = None):
+        return send_quickreply_message(user, message, options)
