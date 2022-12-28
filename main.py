@@ -32,38 +32,38 @@ def webhook(data: WebhookRequestData):
         if not entry.get("messaging"):
             return Response(content="Message not found", status_code=401)
 
-    messaging_events = list(map(event_parser, entry.get("messaging")))
+        messaging_events = list(map(event_parser, entry.get("messaging")))
 
-    for event in messaging_events:
-        user = UserInfo(recipient_id=event.sender)
+        for event in messaging_events:
+            user = UserInfo(recipient_id=event.sender)
 
-        if event.payload == "start":
-            messageBot.send_home_message(user)
+            if event.payload == "start":
+                messageBot.send_home_message(user)
 
-        if event.text == "yelp" or event.payload == "yelp":
-            select_yelp_type(user, messageBot)
-            return Response(content="ok")
+            if event.text == "yelp" or event.payload == "yelp":
+                select_yelp_type(user, messageBot)
+                return Response(content="ok")
 
-        if event.quick_reply in get_yelp_typeIdx():
-            res = get_yelp_info(int(event.quick_reply))
-            messageBot.send_text_message(user, res)
-            return Response(content="ok")
+            if event.quick_reply in get_yelp_typeIdx():
+                res = get_yelp_info(int(event.quick_reply))
+                messageBot.send_text_message(user, res)
+                return Response(content="ok")
 
-        if event.quick_reply == "weather":
-            temp, weather = get_weather_info()
-            messageBot.send_text_message(
-                user, f'The temprature is {temp}F, the weather is {weather}')
-            return Response(content="ok")
+            if event.quick_reply == "weather":
+                temp, weather = get_weather_info()
+                messageBot.send_text_message(
+                    user, f'The temprature is {temp}F, the weather is {weather}')
+                return Response(content="ok")
 
-        if event.payload == "quick":
-            messageBot.send_quickreply_message(
-                user=user, message="What do you want to know", options=["weather", "yelp"])
-            return Response(content="ok")
-        
-        else:
-            messageBot.send_home_message(user)
+            if event.payload == "quick":
+                messageBot.send_quickreply_message(
+                    user=user, message="What do you want to know", options=["weather", "yelp"])
+                return Response(content="ok")
+            
+            else:
+                messageBot.send_home_message(user)
 
-    return Response(content="ok")
+        return Response(content="ok")
 
 
 if __name__ == "__main__":
