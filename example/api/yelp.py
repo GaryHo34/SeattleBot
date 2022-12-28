@@ -1,14 +1,14 @@
-from service import get
-from constant import YELP_API, YELP_URL
+from utils import get
+from config import YELP_API, YELP_URL
 from model import BusinessModel, UserInfo
-from Message import MessageBot
+from messenger import MessengerBot
 
 cuisineType = ["Coffee", "Brunch", "Japanese",
                "Mexican", "American", "Chinese"]
 typeIdx = [str(i+1) for i in range(len(cuisineType))]
 
 
-def select_yelp_type(user: UserInfo, messageBot: MessageBot):
+def select_yelp_type(user: UserInfo, messageBot: MessengerBot):
     types = [str(i+1) + ". " + c for i,
              c in enumerate(cuisineType)]
     msg = f"What do you want to have?\n" + "   ".join(types)
@@ -24,7 +24,7 @@ def get_yelp_info(idx: int):
               'location': 'Seattle, Washington',
               'limit': 10}
     response = get(
-        search_api_url, headers=headers, params=params, timeout=5).json()
+        search_api_url, headers=headers, params=params, timeout=5)
 
     resList = []
     # Error handle if catch response error, get will return None

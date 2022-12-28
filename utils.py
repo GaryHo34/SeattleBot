@@ -1,7 +1,6 @@
 import requests
-from typing import Optional
-
-# Wrap requests service for better error handling
+from model import Event
+from typing import Optional, List
 
 
 def get(
@@ -16,7 +15,7 @@ def get(
                                 params=params,
                                 timeout=timeout)
         response.raise_for_status()
-        return response
+        return response.json()
     except requests.exceptions.HTTPError as errh:
         print("Http Error:", errh)
     except requests.exceptions.ConnectionError as errc:
@@ -31,17 +30,16 @@ def get(
 def post(
     url: str,
     data: dict,
-    headers: Optional[dict] = None,
+    headers: Optional[dict] = {"Content-Type": "application/json"},
     params: Optional[dict] = None
 ):
-    # print(data)
     try:
         response = requests.post(url=url,
                                  headers=headers,
                                  params=params,
                                  json=data)
         response.raise_for_status()
-        return response
+        return response.json()
     except requests.exceptions.HTTPError as errh:
         print("Http Error:", errh)
     except requests.exceptions.ConnectionError as errc:
@@ -51,3 +49,18 @@ def post(
     except requests.exceptions.RequestException as err:
         print("OOps: Something Else", err)
     return None
+
+
+def event_parser(event):
+    postback = event.get("postback")
+    message = event.get("message")
+    quick_rp =  message.get('quick_reply') if message else None
+    sender_id = event["sender"]["id"]
+
+    return Event(
+        type='message' if message else 'postback' if postback else '',
+        sender=sender_id,
+        text=message.get('text') if message else '',
+        quick_reply= quick_rp.get('payload') if quick_rp else '',
+        payload=postback.get('payload') if postback else '',
+    )

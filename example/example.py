@@ -2,7 +2,7 @@ import uvicorn
 from fastapi import FastAPI, Request, Response
 from config import META_VERIFY_TOKEN, FASTAPI_HOST, FASTAPI_PORT
 from model import UserInfo, WebhookRequestData
-from example.api import get_weather_info, get_yelp_info, select_yelp_type, get_yelp_typeIdx
+from api import get_weather_info, get_yelp_info, select_yelp_type, get_yelp_typeIdx
 from utils import event_parser
 from messenger import MessengerBot
 
