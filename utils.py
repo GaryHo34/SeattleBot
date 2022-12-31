@@ -56,10 +56,10 @@ def post(
 
 async def verify_payload(request: Request, X_Hub_Signature_256: str = Header()):
     data = await request.body()
-    expectedHash = hmac.new(
-        META_APP_SECRET.encode(), data, "sha256").hexdigest()
+    expectedHash = hmac.new(META_APP_SECRET.encode(),
+                            data, "sha256").hexdigest()
     if expectedHash != X_Hub_Signature_256[7:]:
-        return Response(content="Couldn't validate the request signature.", status_code=401)
+        return Response(content="Invalid request signature.", status_code=401)
 
 
 def get_event(event):
