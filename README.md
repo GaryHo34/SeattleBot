@@ -55,11 +55,27 @@ Install all the dependencies
 ```
 pip install -r requirements.txt
 ```
+## Start application
+
+Make sure to set up your environment variables
+```
+META_API_URL
+META_APP_SECRET
+PAGE_ACCESS_TOKEN
+VERIFY_TOKEN
+```
 
 Run the app
 
 ```
 uvicorn main:app --reload
+```
+## Installation
+
+To run test
+
+```
+python -m unittest -v tests/tests.py 
 ```
 
 ## Repository Structure

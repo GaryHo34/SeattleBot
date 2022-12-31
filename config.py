@@ -9,6 +9,7 @@ FASTAPI_PORT = int(os.getenv('FASTAPI_PORT'))
 
 # META webhook
 META_API_URL = os.getenv('META_API_URL')
+META_APP_SECRET = os.getenv('META_APP_SECRET')
 META_ACCESS_TOKEN = os.getenv('PAGE_ACCESS_TOKEN')
 META_VERIFY_TOKEN = os.getenv('VERIFY_TOKEN')
 
