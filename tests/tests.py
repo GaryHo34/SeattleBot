@@ -15,7 +15,7 @@ class TestCase(unittest.TestCase):
             title="<BUTTON_TEXT>",
             payload="<STRING_SENT_TO_WEBHOOK>"
         )
-        self.assertEqual(expected_button, postback_button)
+        self.assertEqual(expected_button, postback_button.dict())
 
 
 if __name__ == '__main__':
