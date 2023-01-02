@@ -17,6 +17,17 @@ def verify_webhook(
     hub_challenge: str = Query(alias="hub.challenge"),
     hub_verify_token: str = Query(alias="hub.verify_token"),
 ):
+    """
+    If the request is a valid webhook subscription request, return the challenge
+    string
+
+    Args:
+      hub_mode (str): The mode of the webhook. This should be "subscribe" for the
+    verification request
+      hub_challenge (str): A random string that you must echo back to Facebook
+      hub_verify_token (str): The token that you provided when you subscribed to the
+    webhook
+    """
     if hub_mode != "subscribe" or not hub_challenge:
         return Response(content="Unrecognized params", status_code=400)
     if hub_verify_token != META_VERIFY_TOKEN:
@@ -27,7 +38,15 @@ def verify_webhook(
 @app.post("/", dependencies=[Depends(verify_payload)])
 def message_webhook(events: List[Event] = Depends(event_parser)):
     """
-    Messages handler.
+    It receives a list of events from the webhook, and then for each event, it
+    checks if the event is a text message, and if so, it sends a corresponding
+    response back to the user
+
+    Args:
+      events (List[Event]): List[Event] = Depends(event_parser)
+
+    Returns:
+      a response object with the content "ok"
     """
     if not events:
         return Response(content="Unrecognized webhook", status_code=401)

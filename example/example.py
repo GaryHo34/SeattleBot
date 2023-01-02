@@ -1,3 +1,5 @@
+""" Example code for testing fb messenger bot.
+"""
 import uvicorn
 from fastapi import FastAPI, Request, Response
 from config import META_VERIFY_TOKEN, FASTAPI_HOST, FASTAPI_PORT
@@ -12,6 +14,17 @@ messageBot = MessengerBot(set_profile=False)
 
 @app.get("/")
 def fb_webhook(request: Request):
+    """
+    If the request is a valid webhook subscription request, return the challenge
+    string
+
+    Args:
+      hub_mode (str): The mode of the webhook. This should be "subscribe" for the
+    verification request
+      hub_challenge (str): A random string that you must echo back to Facebook
+      hub_verify_token (str): The token that you provided when you subscribed to the
+    webhook
+    """
     if (request.query_params.get("hub.mode") == "subscribe" and
             request.query_params.get("hub.challenge")):
         if (request.query_params.get("hub.verify_token") != META_VERIFY_TOKEN):
@@ -23,7 +36,15 @@ def fb_webhook(request: Request):
 @app.post("/")
 def webhook(data: WebhookRequestData):
     """
-    Messages handler.
+    It receives a list of events from the webhook, and then for each event, it
+    checks if the event is a text message, and if so, it sends a corresponding
+    response back to the user
+
+    Args:
+      events (List[Event]): List[Event] = Depends(event_parser)
+
+    Returns:
+      a response object with the content "ok"
     """
     if data.object != "page" or not data.entry:
         return Response(content="Incorrect webhook", status_code=401)
@@ -59,7 +80,7 @@ def webhook(data: WebhookRequestData):
             messageBot.send_quickreply_message(
                 user=user, message="What do you want to know", options=["weather", "yelp"])
             return Response(content="ok")
-        
+
         else:
             messageBot.send_home_message(user)
 

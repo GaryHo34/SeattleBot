@@ -1,3 +1,6 @@
+""" Get Yelp recommendations from yelp API.
+"""
+
 from utils import get
 from config import YELP_API, YELP_URL
 from model import BusinessModel, UserInfo
@@ -9,6 +12,14 @@ typeIdx = [str(i+1) for i in range(len(cuisineType))]
 
 
 def select_yelp_type(user: UserInfo, messageBot: MessengerBot):
+    """
+    The function takes in a user and a messenger bot, and sends a quick reply
+    message to the user with a list of cuisine types
+
+    Args:
+      user (UserInfo): UserInfo
+      messageBot (MessengerBot): MessengerBot object
+    """
     types = [str(i+1) + ". " + c for i,
              c in enumerate(cuisineType)]
     msg = f"What do you want to have?\n" + "   ".join(types)
@@ -17,6 +28,16 @@ def select_yelp_type(user: UserInfo, messageBot: MessengerBot):
 
 
 def get_yelp_info(idx: int):
+    """
+    This function takes in an index of the cuisine type, and returns a string of the
+    top 10 recommended restaurants in Seattle.
+
+    Args:
+      idx (int): the index of the cuisine type
+
+    Returns:
+      A string of the top 10 recommended places for the cuisine type
+    """
     cuisine = cuisineType[int(idx) - 1]
     headers = {'Authorization': 'Bearer {}'.format(YELP_API)}
     search_api_url = YELP_URL
