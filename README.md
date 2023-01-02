@@ -30,6 +30,7 @@ Before running the app and utilizing our functions, you will need to do the foll
         * `PAGE_ACCESS_TOKEN` (get it from facebook development page)
         * `VERIFY_TOKEN` (determined by you, enter when connecting the page)
         * `META_API_URL`
+        * `META_APP_SECRET`
 2. **Yelp**
     * Follow this [Blog](https://elfsight.com/blog/2020/11/how-to-get-and-use-yelp-api/) to get:
         * `YELP_CLIENT_ID`
@@ -55,9 +56,11 @@ Install all the dependencies
 ```
 pip install -r requirements.txt
 ```
+
 ## Start application
 
 Make sure to set up your environment variables
+
 ```
 META_API_URL
 META_APP_SECRET
@@ -70,12 +73,13 @@ Run the app
 ```
 uvicorn main:app --reload
 ```
+
 ## Installation
 
 To run test
 
 ```
-python -m unittest -v tests/tests.py 
+python -m unittest -v tests/tests.py
 ```
 
 ## Repository Structure
