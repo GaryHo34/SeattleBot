@@ -1,3 +1,5 @@
+"""This module stores models related to types of messages.
+"""
 from pydantic import BaseModel
 from typing import List, Optional, Union
 
