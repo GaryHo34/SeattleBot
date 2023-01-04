@@ -1,6 +1,6 @@
 from config import META_ACCESS_TOKEN, META_API_URL
 from typing import Optional, List, Union
-from model import UserInfo, TextMessage, WeburlButton, PostbackButton, QuickReply, QuickReplyMessage, PersistentMenu
+from model import *
 from utils import post
 from typing import Optional, List, Union
 
@@ -10,7 +10,7 @@ PARAMS = {"access_token": META_ACCESS_TOKEN}
 IMAGE_SRC = "https://media.cntraveler.com/photos/60480c67ff9cba52f2a91899/16:9/w_2560%2Cc_limit/01-velo-header-seattle-needle.jpg"
 
 
-def generate_menu(
+def generate_presistent_menu(
     buttons: List[Union[PostbackButton, WeburlButton]],
     locale: Optional[str] = None,
     composer_input_disable: Optional[bool] = None
@@ -20,7 +20,7 @@ def generate_menu(
 
     Args:
       buttons (List[Union[PostbackButton, WeburlButton]]):
-    List[Union[PostbackButton, WeburlButton]]
+        List[Union[PostbackButton, WeburlButton]]
       locale (Optional[str]): The locale of the menu.
       composer_input_disable (Optional[bool]): This is a boolean value that
     determines whether the user can type in the text field to send a message to the
@@ -30,8 +30,11 @@ def generate_menu(
       A dictionary representing persistent menu
     """
     if (locale and composer_input_disable != None):
-        PersistentMenu(
-            locale=locale, composer_input_disabled=composer_input_disable, buttons=buttons).dict()
+        return PersistentMenu(
+            locale=locale,
+            composer_input_disabled=composer_input_disable,
+            buttons=buttons
+        ).dict()
     return PersistentMenu(call_to_actions=buttons).dict()
 
 
@@ -86,128 +89,6 @@ def generate_quickreply_message(
     return QuickReplyMessage(text=message, quick_replies=optionList).dict()
 
 
-def send_text_message(user: UserInfo, message: str):
-    """
-    It sends a text message to the user
-
-    Args:
-      user (UserInfo): UserInfo - the user to send the message to
-      message (str): The message to send to the user.
-    """
-    post(
-        url=META_API_URL,
-        params=PARAMS,
-        data={
-            "recipient": {"id": user.recipient_id},
-            "message": TextMessage(text=message).dict()
-        },
-    )
-
-
-def send_quickreply_message(
-    user: UserInfo,
-    message: str,
-    options: Optional[List[str]] = None
-):
-    """
-    It sends a quick reply message to the user
-
-    Args:
-      user (UserInfo): UserInfo
-      message (str): The message to be sent.
-      options (Optional[List[str]]): List of strings that will be used as the quick
-    reply options.
-    """
-    post(
-        url=META_API_URL,
-        params=PARAMS,
-        data={
-            "recipient": {"id": user.recipient_id},
-            "message": generate_quickreply_message(message, options)
-        },
-    )
-
-
-def send_template_message(user: UserInfo, message: str):
-    """
-    It sends a template message to the user with a button that opens the Messenger
-    website and another button that sends a postback payload to the bot
-
-    Args:
-      user (UserInfo): UserInfo
-      message (str): The message to be sent.
-    """
-    post(
-        url=META_API_URL,
-        params=PARAMS,
-        data={
-            "recipient": {"id": user.recipient_id},
-            "message": {
-                "attachment": {
-                    "type": "template",
-                    "payload": {
-                        "template_type": "button",
-                        "text": message,
-                        "buttons": [
-                            WeburlButton(title="Visit Messenger",
-                                         url="https://www.messenger.com").dict(),
-                            PostbackButton(title="Ask weather",
-                                           payload="weather").dict()
-                        ]
-                    }
-                }
-            }
-        }
-    )
-
-
-def send_home_message(user: UserInfo):
-    """
-    This function sends a message to the user with a welcome message and a list of
-    buttons that the user can click on
-
-    Args:
-      user (UserInfo): UserInfo
-    """
-    post(
-        url=META_API_URL,
-        params=PARAMS,
-        data={
-            "recipient": {
-                "id": user.recipient_id
-            },
-            "message": {
-                "attachment": {
-                    "type": "template",
-                    "payload": {
-                            "template_type": "generic",
-                        "elements": [
-                            {
-                                "title": "Welcome!",
-                                "image_url": IMAGE_SRC,
-                                "subtitle": "Your BEST Seattle local guide!",
-                                "default_action": {
-                                            "type": "web_url",
-                                            "url": "https://github.com/GaryHo34/SeattleBot",
-                                            "webview_height_ratio": "tall",
-                                },
-                                "buttons": [
-                                    generate_web_button(
-                                        title="Our GitHub Page", url="https://github.com/GaryHo34/SeattleBot"),
-                                    generate_postback_button(
-                                        title="Local Recommendation", postback="yelp"),
-                                    generate_postback_button(
-                                        title="Quick Actions", postback="quick"),
-                                ]
-                            }
-                        ]
-                    }
-                }
-            }
-        }
-    )
-
-
 def set_messenger_profile():
     """
     It sends a POST request to the Messenger Profile API endpoint with the following
@@ -230,7 +111,7 @@ def set_messenger_profile():
                 }
             ],
             "persistent_menu": [
-                generate_menu(buttons=[
+                generate_presistent_menu(buttons=[
                     generate_web_button(
                         title="Our GitHub Page", url="https://github.com/GaryHo34/SeattleBot"),
                     generate_postback_button(
@@ -258,13 +139,114 @@ class MessengerBot():
             set_messenger_profile()
 
     def send_text_message(self, user: UserInfo, message: str):
-        return send_text_message(user, message)
+        """
+        It sends a text message to the user
+
+        Args:
+            user (UserInfo): UserInfo - the user to send the message to
+            message (str): The message to send to the user.
+        """
+        post(
+            url=META_API_URL,
+            params=PARAMS,
+            data={
+                "recipient": {"id": user.recipient_id},
+                "message": TextMessage(text=message).dict()
+            },
+        )
 
     def send_template_message(self, user: UserInfo, message: str):
-        return send_template_message(user, message)
+        """
+        It sends a template message to the user with a button that opens the Messenger
+        website and another button that sends a postback payload to the bot
+
+        Args:
+        user (UserInfo): UserInfo
+        message (str): The message to be sent.
+        """
+        post(
+            url=META_API_URL,
+            params=PARAMS,
+            data={
+                "recipient": {"id": user.recipient_id},
+                "message": {
+                    "attachment": TemplateMessage(
+                        payload=ButtonTemplate(
+                            text=message,
+                            buttons=[
+                                WeburlButton(
+                                    title="Visit Messenger",
+                                    url="https://www.messenger.com"
+                                ),
+                                PostbackButton(
+                                    title="Ask weather",
+                                    payload="weather"
+                                ),
+                            ]
+                        )
+                    ).dict()
+                }
+            }
+        )
 
     def send_home_message(self, user: UserInfo):
-        return send_home_message(user)
+        """
+        This function sends a message to the user with a welcome message and a list of
+        buttons that the user can click on
+
+        Args:
+        user (UserInfo): UserInfo
+        """
+        post(
+            url=META_API_URL,
+            params=PARAMS,
+            data={
+                "recipient": {
+                    "id": user.recipient_id
+                },
+                "message": {
+                    "attachment": TemplateMessage(
+                        payload=GenericTemplate(
+                            elements=[GenericTemplateElement(
+                                title="Welcome!",
+                                subtitle="Your BEST Seattle local guide!",
+                                image_url=IMAGE_SRC,
+                                default_action=DefaultAction(
+                                    url="https://github.com/GaryHo34/SeattleBot",
+                                    webview_height_ratio='tall'
+                                ),
+                                buttons=[
+                                    WeburlButton(
+                                        title="Visit Messenger",
+                                        url="https://www.messenger.com"
+                                    ),
+                                    PostbackButton(
+                                        title="Ask weather",
+                                        payload="weather"
+                                    ),
+                                ]
+                            )],
+                        )
+                    ).dict()
+                }
+            }
+        )
 
     def send_quickreply_message(self, user: UserInfo, message: str, options: Optional[List[str]] = None):
-        return send_quickreply_message(user, message, options)
+        """
+        It sends a quick reply message to the user
+
+        Args:
+            user (UserInfo): UserInfo
+            message (str): The message to be sent.
+            options (Optional[List[str]]): List of strings that will be used as the quick
+            reply options.
+        """
+        post(
+            url=META_API_URL,
+            params=PARAMS,
+            data={
+                "recipient": {"id": user.recipient_id},
+                "message": generate_quickreply_message(message, options)
+            },
+        )
