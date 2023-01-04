@@ -43,7 +43,8 @@ class TestCase(unittest.TestCase):
         expected_button = {
             "type": "web_url",
             "url": "<URL_TO_OPEN_IN_WEBVIEW>",
-            "title": "<BUTTON_TEXT>"
+            "title": "<BUTTON_TEXT>",
+            'webview_height_ratio': 'full'
         }
         weburl_button = WeburlButton(
             title="<BUTTON_TEXT>",
@@ -67,6 +68,95 @@ class TestCase(unittest.TestCase):
             image_url="<URL>"
         )
         self.assertEqual(expected_reply, quick_reply.dict())
+
+
+    def test_button_template(self):
+        """
+        It tests button template.
+        """
+        expected_template = {
+            "type": "template",
+            "payload": {
+                "template_type": "button",
+                "text": "What do you want to do next?",
+                "buttons": [
+                    {
+                        "type": "web_url",
+                        "url": "https://www.messenger.com",
+                        "title": "Visit Messenger",
+                        'webview_height_ratio': 'full'
+                    }
+                ]
+            }}
+        button_template = TemplateMessage(
+            payload=ButtonTemplate(
+                text="What do you want to do next?",
+                buttons=[WeburlButton(
+                    title="Visit Messenger",
+                    url="https://www.messenger.com"
+                )]
+            )
+        )
+        self.assertEqual(expected_template, button_template.dict())
+
+    def test_generic_template(self):
+        """
+        It tests generic template.
+        """
+        expected_template = {
+            "type": "template",
+            "payload": {
+                "template_type": "generic",
+                "elements": [
+                    {
+                        "title": "Welcome!",
+                        "subtitle": "We have the right hat for everyone.",
+                        "image_url": "https://petersfancybrownhats.com/company_image.png",
+                        "default_action": {
+                            "type": "web_url",
+                            "url": "https://petersfancybrownhats.com/view?item=103",
+                            "webview_height_ratio": "tall",
+                        },
+                        "buttons": [
+                            {
+                                "type": "web_url",
+                                "url": "https://petersfancybrownhats.com",
+                                "title": "View Website",
+                                "webview_height_ratio": "full",
+                            }, {
+                                "type": "postback",
+                                "title": "Start Chatting",
+                                "payload": "DEVELOPER_DEFINED_PAYLOAD"
+                            }
+                        ]
+                    }
+                ]
+            }
+        }
+        generic_template = TemplateMessage(
+            payload=GenericTemplate(
+                elements=[GenericTemplateElement(
+                    title="Welcome!",
+                    image_url="https://petersfancybrownhats.com/company_image.png",
+                    subtitle="We have the right hat for everyone.",
+                    default_action=DefaultAction(
+                        url="https://petersfancybrownhats.com/view?item=103",
+                        webview_height_ratio="tall",
+                    ),
+                    buttons=[
+                        WeburlButton(
+                            title="View Website",
+                            url="https://petersfancybrownhats.com",
+                        ),
+                        PostbackButton(
+                            title="Start Chatting",
+                            payload="DEVELOPER_DEFINED_PAYLOAD"
+                        )
+                    ]
+                )]
+            )
+        )
+        self.assertEqual(expected_template, generic_template.dict())
 
     def test_quick_reply_msg(self):
         quick_reply = QuickReply(
@@ -123,6 +213,7 @@ class TestCase(unittest.TestCase):
         business = BusinessModel(name="<NAME>", address="<ADDRESS>",
                                  rating="<RATING>", rating_count=1)
         self.assertEqual(expected_business, business)
+
 
 
 if __name__ == '__main__':

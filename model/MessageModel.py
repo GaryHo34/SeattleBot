@@ -1,7 +1,5 @@
-"""This module stores models related to types of messages.
-"""
-from pydantic import BaseModel
-from typing import List, Optional, Union
+from pydantic import BaseModel, constr, conlist, Field
+from typing import List, Optional, Union, Literal
 
 
 class Event(BaseModel):
@@ -18,16 +16,15 @@ class TextMessage(BaseModel):
 
 class WeburlButton(BaseModel):
     type: str = "web_url"
-    title: str
+    title: constr(max_length=20)
     url: str
+    webview_height_ratio: Literal['compact', 'tall', 'full'] = 'full'
 
 
 class PostbackButton(BaseModel):
     type: str = "postback"
     title: str
     payload: str
-
-# Only support quickreply  text + button
 
 
 class QuickReply(BaseModel):
@@ -41,7 +38,35 @@ class QuickReplyMessage(BaseModel):
     text: str
     quick_replies: List[QuickReply]
 
-# Todo type definition for GENERIC template message
+
+class ButtonTemplate(BaseModel):
+    template_type: str = "button"
+    text: str
+    buttons: List[Union[PostbackButton, WeburlButton]]
+
+
+class DefaultAction(BaseModel):
+    type: str = "web_url"
+    url: str
+    webview_height_ratio: Literal['compact', 'tall', 'full'] = 'full'
+
+
+class GenericTemplateElement(BaseModel):
+    title: str
+    subtitle: Optional[str]
+    image_url: Optional[str]
+    default_action: Optional[DefaultAction]
+    buttons: conlist(Union[PostbackButton, WeburlButton], max_items=3)
+
+
+class GenericTemplate(BaseModel):
+    template_type: str = "generic"
+    elements: conlist(GenericTemplateElement, max_items=1)
+
+
+class TemplateMessage(BaseModel):
+    type: str = "template"
+    payload: Union[ButtonTemplate, GenericTemplate]
 
 
 class PersistentMenu(BaseModel):
