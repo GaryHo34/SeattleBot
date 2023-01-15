@@ -126,3 +126,7 @@ python -m unittest -v tests/tests.py
  ┣ 📜requirements.txt
  ┗ 📜utils.py
 ```
+
+## Contributors
+- [@mereluo](https://github.com/mereluo)
+- [@GaryHo34](https://github.com/GaryHo34)
