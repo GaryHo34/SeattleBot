@@ -5,12 +5,12 @@ services:
     ports:
       - 4551:4551
     links:
-      - web
+      - server
     environment:
       - DOMAIN=web
       - PORT=80
       - AUTH_TOKEN=<YOUR NGROK AUTH_TOKEN>
       
-  web:
+  server:
     build: .
     container_name: pymessenger
