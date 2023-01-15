@@ -1,6 +1,6 @@
 # Seattle Bot
 
-This is a **Facebook Messenger Bot** implemented with FastAPI. It aims to a easy-to-use framework for developers to develop their own messenger chatBot.
+This is a **Facebook Messenger Bot** implemented with FastAPI. It aims to provide a easy-to-use framework for developers to develop their own messenger chatBot.
 
 ---
 
