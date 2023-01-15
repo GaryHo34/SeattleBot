@@ -1,6 +1,6 @@
 # Seattle Bot
 
-This is a **Facebook Messenger Bot** implemented with FastAPI. It aims to provide users with Seattle local information and build wrapper for Facebook messenger platform for ease of use.
+This is a **Facebook Messenger Bot** implemented with FastAPI. It aims to provide a easy-to-use framework for developers to develop their own messenger chatBot.
 
 ---
 
@@ -26,12 +26,19 @@ Before running the app and utilizing our functions, you will need to do the foll
 
 1. **Facebook**
     * Create a Facebook page and [Create a Facebook App](https://developers.facebook.com/apps/)
+    * The default API version is v15.0
     * Obtain three things:
         * `PAGE_ACCESS_TOKEN` (get it from facebook development page)
         * `VERIFY_TOKEN` (determined by you, enter when connecting the page)
-        * `META_API_URL`
-        * `META_APP_SECRET`
-2. **Yelp**
+        * `META_APP_SECRET` (get it from facebook development page => Basic Info => Application Secret)
+
+2. **Ngrok**
+    * We use [Ngrok](https://ngrok.com/docs/getting-started) to expose our localhost server on the internet.
+    * Please make sure to sign up and get your own `AUTH_TOKEN` to get full access of ngrok's function.
+
+If you interested in our example chatBot
+
+3. **Yelp**
     * Follow this [Blog](https://elfsight.com/blog/2020/11/how-to-get-and-use-yelp-api/) to get:
         * `YELP_CLIENT_ID`
         * `YELP_API_KEY`
@@ -44,37 +51,48 @@ Clone this repository
 git clone git@github.com:GaryHo34/SeattleBot.git
 ```
 
-Create your own venv environment
+We provided two way to start the chatBot backend server
+
+#### Start in local
+Create your own venv environment and install all the dependencies
 
 ```
 python3 -m venv .venv
 . .venv/bin/activate
-```
-
-Install all the dependencies
-
-```
 pip install -r requirements.txt
 ```
 
-## Start application
-
-Make sure to set up your environment variables
+Make your own .env file and fill the required env variable then
 
 ```
-META_API_URL
-META_APP_SECRET
-PAGE_ACCESS_TOKEN
-VERIFY_TOKEN
+python3 main.py
 ```
 
-Run the app
+After the FastAPI server is up, open a terminal and start a ngork service
 
 ```
-uvicorn main:app --reload
+ngrok http 8000
 ```
 
-## Installation
+Verify your webhook url on the facebook developer dashboard.
+
+#### Start in docker
+
+Get your ngrok `AUTH_TOKEN` and paste it in `docker-compose.yml`
+```
+AUTH_TOKEN=<YOUR NGROK AUTH_TOKEN>
+```
+
+Run your chatBot with a single command
+```
+docker-compose up
+```
+You can find your ngrok url by visiting `http://localhost:4551`
+
+Verify your webhook url on the facebook developer dashboard.
+
+
+## Testing
 
 To run test
 
@@ -109,3 +127,7 @@ python -m unittest -v tests/tests.py
  ┣ 📜requirements.txt
  ┗ 📜utils.py
 ```
+
+## Contributors
+- [@mereluo](https://github.com/mereluo)
+- [@GaryHo34](https://github.com/GaryHo34)
