@@ -1,0 +1,16 @@
+version: '3'
+services:
+  ngrok:
+    image: shkoliar/ngrok:latest
+    ports:
+      - 4551:4551
+    links:
+      - web
+    environment:
+      - DOMAIN=web
+      - PORT=80
+      - AUTH_TOKEN=<YOUR NGROK AUTH_TOKEN>
+      
+  web:
+    build: .
+    container_name: pymessenger
