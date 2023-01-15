@@ -1,14 +1,14 @@
 import uvicorn
 from fastapi import FastAPI, Response, Depends, Query
 from config import META_VERIFY_TOKEN, FASTAPI_HOST, FASTAPI_PORT
-from model import UserInfo, Event
+from model import Event
 from example.api import get_weather_info, get_yelp_info, select_yelp_type, get_yelp_typeIdx
 from utils import event_parser, verify_payload
 from typing import List
 from messenger import MessengerBot
 
 app = FastAPI()
-messageBot = MessengerBot(set_profile=False)
+messageBot = MessengerBot(set_profile=True)
 
 
 @app.get("/")
@@ -18,15 +18,7 @@ def verify_webhook(
     hub_verify_token: str = Query(alias="hub.verify_token"),
 ):
     """
-    If the request is a valid webhook subscription request, return the challenge
-    string
-
-    Args:
-      hub_mode (str): The mode of the webhook. This should be "subscribe" for the
-    verification request
-      hub_challenge (str): A random string that you must echo back to Facebook
-      hub_verify_token (str): The token that you provided when you subscribed to the
-    webhook
+    This route is only for webhook address validation.
     """
     if hub_mode != "subscribe" or not hub_challenge:
         return Response(content="Unrecognized params", status_code=400)
@@ -52,33 +44,47 @@ def message_webhook(events: List[Event] = Depends(event_parser)):
         return Response(content="Unrecognized webhook", status_code=401)
 
     for event in events:
-        user = UserInfo(recipient_id=event.sender)
-
-        if event.payload == "start":
-            messageBot.send_home_message(user)
-
-        if event.text == "yelp" or event.payload == "yelp":
-            select_yelp_type(user, messageBot)
+        if event.text.find("echo") == 0:
+            words = event.text.split(' ')
+            messageBot.send_text_message(
+                recipient_id=event.sender,
+                message=' '.join(words[1:]),
+            )
             return Response(content="ok")
 
-        if event.quick_reply in get_yelp_typeIdx():
-            res = get_yelp_info(int(event.quick_reply))
-            messageBot.send_text_message(user, res)
+        if event.payload == "start":
+            messageBot.send_text_message(
+                recipient_id=event.sender,
+                message="Hello, world!",
+            )
+            return Response(content="ok")
+
+        if event.quick_reply == "echo":
+            temp, weather = get_weather_info()
+            messageBot.send_text_message(
+                recipient_id=event.sender,
+                message="Type echo <YOUR MESSAGE>"
+            )
             return Response(content="ok")
 
         if event.quick_reply == "weather":
             temp, weather = get_weather_info()
             messageBot.send_text_message(
-                user, f'The temprature is {temp}F, the weather is {weather}')
+                recipient_id=event.sender,
+                message=f'The temprature is {temp}F, the weather is {weather}'
+            )
             return Response(content="ok")
 
         if event.payload == "quick":
             messageBot.send_quickreply_message(
-                user=user, message="What do you want to know", options=["weather", "yelp"])
+                recipient_id=event.sender,
+                message="This is a quick message example",
+                options=["echo", "weather"]
+            )
             return Response(content="ok")
 
         else:
-            messageBot.send_home_message(user)
+            messageBot.send_home_message(recipient_id=event.sender)
 
     return Response(content="ok")
 
