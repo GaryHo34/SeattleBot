@@ -3,7 +3,7 @@
 
 from utils import get
 from config import YELP_API, YELP_URL
-from model import BusinessModel, UserInfo
+from model import BusinessModel
 from messenger import MessengerBot
 
 cuisineType = ["Coffee", "Brunch", "Japanese",
@@ -11,20 +11,20 @@ cuisineType = ["Coffee", "Brunch", "Japanese",
 typeIdx = [str(i+1) for i in range(len(cuisineType))]
 
 
-def select_yelp_type(user: UserInfo, messageBot: MessengerBot):
+def select_yelp_type(recipient_id: str, messageBot: MessengerBot):
     """
     The function takes in a user and a messenger bot, and sends a quick reply
     message to the user with a list of cuisine types
 
     Args:
-      user (UserInfo): UserInfo
+      recipient_id: recipient_id
       messageBot (MessengerBot): MessengerBot object
     """
     types = [str(i+1) + ". " + c for i,
              c in enumerate(cuisineType)]
     msg = f"What do you want to have?\n" + "   ".join(types)
     messageBot.send_quickreply_message(
-        user=user, message=msg, options=typeIdx)
+        recipient_id=recipient_id, message=msg, options=typeIdx)
 
 
 def get_yelp_info(idx: int):

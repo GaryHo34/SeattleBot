@@ -69,7 +69,6 @@ class TestCase(unittest.TestCase):
         )
         self.assertEqual(expected_reply, quick_reply.dict())
 
-
     def test_button_template(self):
         """
         It tests button template.
@@ -197,14 +196,6 @@ class TestCase(unittest.TestCase):
         webhook_data = WebhookRequestData()
         self.assertEqual(expected_webhook, webhook_data)
 
-    def test_user_info(self):
-        expected_user = {
-            "recipient_id": "<ID>", "message_text": "None",
-            "message_type": "RESPONSE"
-        }
-        user_info = UserInfo(recipient_id="<ID>")
-        self.assertEqual(expected_user, user_info)
-
     def test_business_model(self):
         expected_business = {
             "name": "<NAME>",  "address": "<ADDRESS>",
@@ -213,7 +204,6 @@ class TestCase(unittest.TestCase):
         business = BusinessModel(name="<NAME>", address="<ADDRESS>",
                                  rating="<RATING>", rating_count=1)
         self.assertEqual(expected_business, business)
-
 
 
 if __name__ == '__main__':

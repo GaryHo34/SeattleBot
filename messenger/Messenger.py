@@ -1,10 +1,11 @@
-from config import META_ACCESS_TOKEN, META_API_URL
+from config import META_ACCESS_TOKEN
 from typing import Optional, List, Union
 from model import *
 from utils import post
 from typing import Optional, List, Union
 
 # constant
+META_API_URL = "https://graph.facebook.com/v15.0/me/messages"
 MESSAGE_PROFILE_URL = "https://graph.facebook.com/v15.0/me/messenger_profile"
 PARAMS = {"access_token": META_ACCESS_TOKEN}
 IMAGE_SRC = "https://media.cntraveler.com/photos/60480c67ff9cba52f2a91899/16:9/w_2560%2Cc_limit/01-velo-header-seattle-needle.jpg"
@@ -138,7 +139,7 @@ class MessengerBot():
         if set_profile:
             set_messenger_profile()
 
-    def send_text_message(self, user: UserInfo, message: str):
+    def send_text_message(self, recipient_id: str, message: str):
         """
         It sends a text message to the user
 
@@ -150,12 +151,12 @@ class MessengerBot():
             url=META_API_URL,
             params=PARAMS,
             data={
-                "recipient": {"id": user.recipient_id},
+                "recipient": {"id": recipient_id},
                 "message": TextMessage(text=message).dict()
             },
         )
 
-    def send_template_message(self, user: UserInfo, message: str):
+    def send_template_message(self, recipient_id: str, message: str):
         """
         It sends a template message to the user with a button that opens the Messenger
         website and another button that sends a postback payload to the bot
@@ -168,7 +169,7 @@ class MessengerBot():
             url=META_API_URL,
             params=PARAMS,
             data={
-                "recipient": {"id": user.recipient_id},
+                "recipient": {"id": recipient_id},
                 "message": {
                     "attachment": TemplateMessage(
                         payload=ButtonTemplate(
@@ -182,6 +183,10 @@ class MessengerBot():
                                     title="Ask weather",
                                     payload="weather"
                                 ),
+                                PostbackButton(
+                                    title="Quick reply",
+                                    payload="quick"
+                                ),
                             ]
                         )
                     ).dict()
@@ -189,7 +194,7 @@ class MessengerBot():
             }
         )
 
-    def send_home_message(self, user: UserInfo):
+    def send_home_message(self, recipient_id: str):
         """
         This function sends a message to the user with a welcome message and a list of
         buttons that the user can click on
@@ -202,7 +207,7 @@ class MessengerBot():
             params=PARAMS,
             data={
                 "recipient": {
-                    "id": user.recipient_id
+                    "id": recipient_id
                 },
                 "message": {
                     "attachment": TemplateMessage(
@@ -232,7 +237,7 @@ class MessengerBot():
             }
         )
 
-    def send_quickreply_message(self, user: UserInfo, message: str, options: Optional[List[str]] = None):
+    def send_quickreply_message(self, recipient_id: str, message: str, options: Optional[List[str]] = None):
         """
         It sends a quick reply message to the user
 
@@ -246,7 +251,7 @@ class MessengerBot():
             url=META_API_URL,
             params=PARAMS,
             data={
-                "recipient": {"id": user.recipient_id},
+                "recipient": {"id": recipient_id},
                 "message": generate_quickreply_message(message, options)
             },
         )
