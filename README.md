@@ -83,10 +83,11 @@ Get your ngrok `AUTH_TOKEN` and paste it in `docker-compose.yml`
 AUTH_TOKEN=<YOUR NGROK AUTH_TOKEN>
 ```
 
+Run your chatBot with a single command
 ```
 docker-compose up
 ```
-You can find your ngrok url by visiting `localhost:4551`
+You can find your ngrok url by visiting `http://localhost:4551`
 
 Verify your webhook url on the facebook developer dashboard.
 
