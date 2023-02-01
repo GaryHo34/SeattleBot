@@ -131,3 +131,12 @@ python -m unittest -v tests/tests.py
 ## Contributors
 - [@mereluo](https://github.com/mereluo)
 - [@GaryHo34](https://github.com/GaryHo34)
+
+
+## Tech Stacks
+- FastAPI
+- Facebook Webhook
+- Docker
+- Docker-compose
+- Github Actions
+- DigitalOcean
