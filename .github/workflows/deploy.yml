@@ -18,6 +18,7 @@ jobs:
         key: ${{secrets.SSH_KEY}}
         username: ${{secrets.SSH_USERNAME}}
         script: |
+          rm -f SeattleBot
           mkdir SeattleBot
           cd SeattleBot
           git clone git@github.com:GaryHo34/SeattleBot.git
