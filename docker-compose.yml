@@ -9,7 +9,7 @@ services:
     environment:
       - DOMAIN=server
       - PORT=80
-      - AUTH_TOKEN=<YOUR NGROK AUTH_TOKEN>
+      - AUTH_TOKEN=${AUTH_TOKEN}
       
   server:
     build: .

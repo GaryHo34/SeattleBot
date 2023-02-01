@@ -1,0 +1,23 @@
+# Deploy latest main branch to droplet
+name: Deploy to digitalOcean droplet
+
+# Todo: This workflow would be enabled when we want to manually deploy to the staging.
+on:
+  push:
+    branches: [main]
+
+jobs:
+  deploy:
+    name: Deploy MessengerBot
+    uses: appleboy/ssh-action@v0.1.2
+    with:
+      host: ${{secrets.SSH_HOST}}
+      key: ${{secrets.SSH_KEY}}
+      username: ${{secrets.SSH_USERNAME}}
+
+      script: |
+        mkdir SeattleBot
+        cd SeattleBot
+        git clone git@github.com:GaryHo34/SeattleBot.git
+        export AUTH_TOKEN=${{secrets.AUTH_TOKEN}}
+        docker compose up
