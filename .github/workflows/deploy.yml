@@ -8,8 +8,8 @@ on:
 
 jobs:
   deploy:
-    - name: Deploy MessengerBot
-      uses: appleboy/ssh-action@v0.1.2
+    - name: SSH Remote Commands
+      uses: appleboy/ssh-action@v0.1.7
       with:
         host: ${{secrets.SSH_HOST}}
         key: ${{secrets.SSH_KEY}}
