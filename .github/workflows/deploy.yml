@@ -1,11 +1,9 @@
 # Deploy latest main branch to droplet
 name: Deploy to digitalOcean droplet
 
-# Todo: This workflow would be enabled when we want to manually deploy to the staging.
 on:
   push:
     branches: [main]
-
 
 jobs:
   deploy:
