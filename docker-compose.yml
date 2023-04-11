@@ -9,7 +9,7 @@ services:
     environment:
       - DOMAIN=server
       - PORT=80
-      - AUTH_TOKEN=${AUTH_TOKEN}
+      - AUTH_TOKEN=2GeOZGz1YrLsGZDrIkz9bg3fRLR_4bLU6McytaivzsxL8ukU9
       
   server:
     build: .
