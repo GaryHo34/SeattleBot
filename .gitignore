@@ -5,3 +5,6 @@ __pycache__/
 .venv
 .env
 .vscode
+ 
+# mac files
+.DS_Store
