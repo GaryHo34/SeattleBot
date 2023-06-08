@@ -8,3 +8,5 @@ __pycache__/
  
 # mac files
 .DS_Store
+
+server.py
